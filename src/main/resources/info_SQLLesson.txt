@@ -1,0 +1,107 @@
+Transaction(Tranzaksiya) - bu database bilan bog'lanish uchun ish birligi
+biza har bitta SQL so'rov jo'natganimizda tranzaksiyani ochishimiz kerak va muvafaqiyatli
+yakunlanganda uni commit qilishmiz kerak bo'ladi by defualt tranzaksiyalar SQL so'rov
+jo'natilganda ochiladi
+-----------------------------------------------------------------------------
+
+Tranzaksiyalar holatiga qarab ikki turga bo'linadi ular yoki bajariladi yoki umuman
+bajarilmaydi yani bajarilishi tushunarli umuman bajarilmasligi misol uchun deylik biz qandaydir
+zaproslarni qildik va keyin yana bir so'rov jo'natdik deylik mavjud bo'lmagan foreign key
+bilan bog'lamoqchimiz yoki not null column ga null qiymat berbi qo'ydik shu holatda
+so'rov bajarilmaydi va rollback yani so'rovlarni boshqatdan jo'natishimiz kerak bo'ladi
+
+
+-----------------------------------------------------------------------------
+Tranzaksiyalar ni 4 ta toolslari bor(свойтва) kerakli instrumentlari
+ACID
+1.Atomicity(атомарность)
+Bu har bir tranzaksiya muvafaqiyatli bo'lishi kerak degani yoki uspeshno bo'ladi
+yoki umuman hechnima bajarilmaydi yoki hammasi yoki hechnarsa bajarlishi kerak
+
+-----------------------------------------------------------------------------
+2.Consistency(согласовность,последовательность) rozililik mosligi
+deylik bizani hamma so'rovlarimiz qandaydr SQL table dagi hamma shartlarga tushdi
+va biz shartlarni hammasi bajardik shunga etiladi qandaydir shart bajarilmasdan qolishi kerak emas
+
+-----------------------------------------------------------------------------
+3.Isolation(изоляция) himoyalash
+bilamzki database ga client va admin umuman juda ko'p odam muroajat qilishui mumkin
+ular alohida tranzaksiylar ochib alohida murojat qiladi bir birini so'rovlari aralashib
+ketmasligi uchun ularni bir biriga halaqit qilmaydigan qilish kerak bo'ladi shunga etiladi'
+
+-----------------------------------------------------------------------------
+4.Druability(ustoychvast,долговечность) jidamlilik
+misol uchun qandaydr so'rovlar bajardik va uni saqlab qo'ydik vdrug svet o'chib qoldi
+keyin svet kelgandan keyin biz saqlagan malumotlar saqlangan holatda turshi zarur
+
+
+*****************************************************************************
+*****************************************************************************
+Tranzaksiyalardagi hatoliklarni ko'rib chiqamiz ular 4tda
+
+1. Lost Update(Потерянное обновление)
+Misol uchun bir tranzaksiydan bir odam qandaydir o'zgartish kiritdi deylik
+5$ biletni yana 5$ qoshib 10$ qilmdi va commit qildi u o'zgartirish kiritayotkan payt
+yana boshqa bir tranzaksiydan ikkinchi odam ham usha biletni narxini pastga tushurdi
+faqat u keyin nmadr sabab bilan rollback qildi yani ortga qaytish qildi bu holatda
+ikkila odamni qilgan o'zgartirishi ham yoqolib ketadi va malumot birinchi eski holatida
+qolaveradi shu hatolikga o'zgarish yoqotilishi deyiladi bu zamonavit SQL larda
+yuz bermaydi bu holatni oldi olingan
+
+lostupdate(rasmiga qaralsin)
+
+-----------------------------------------------------------------------------
+2.Dirty Read(Грязное чтение)
+Misol uchun deylik bir tranzaksiydan yuqoridagi biletlarmzni narxini o'zgartirdi
+8$ edi uni 10$ ga ko'tardi va usha payt ikkinchi tranzaksiyadan boshqa odam
+biletni 10$ ekanligini ko'rdi uni sotib olmoqchi bo'ldi
+va sotib olib commit qildi u commit qilayotgan payt birinchi tranzaksiyadagi odam
+rollback qildi yani adashib ketganligini bilib ortga qaytdi bu payt ikkinchi
+tranzaksiydagi odam Грязное malumotlar bilan ish qildi shu holatga Drity read
+deyiladi
+
+diryread(rasmiga qaralsin)
+
+-----------------------------------------------------------------------------
+
+3.Non Repeatable Read(Неповторяемое чтение)
+Takrorlanmaslik soddaroq qilib etkanda ikki martta select qilinganda ikki hil javob
+kelishligi deylik haligi biletlarmiz bor 1 chi tranzaksiya biletga so'rov berdi
+va 5$ ligini ko'rdi va sotib olishni bosdi va yana boshqa namdir ish qilishni boshladi
+hali tranzaksiyasini yopmadi va biroz o'tishi bilan ikkinchi tranzaksiya bilet
+narxini 10$ ga ko'tardi va srazu commit qildi birinchi tranzaksiya ochgan odam
+ikkinchi martta so'rov jo'natdi qarasa bilet narxi oshib qolibdi bu hato
+yani bitta tranzaksiyani o'zida ikki martta so'rov yuborvommiz va ikki hil javob
+ovommiz bunday bo'lishi mumkin emas va yana bir holat
+
+nonrepeatableread(rasmiga qaralsin)
+
+Last Commit Wins(oxirgi commit qilgan yutadi)
+yana usha biletdan misol 1tranzaksiya select qildi va 5$ bilet ko'rdi va unda sal
+otib 2transaksiya select qildi 1tranzaksiya biletni 10$ga oshirdi va commit qildi
+undan biroz keyinroq 2tranzaksiya biletni 12$ ga oshirdi va commit qildi
+bilet esa oxirgi commit qilgan tranzaksiyani o'zgarishidaka bo'lid bu nohaq bir holat
+
+lastcommitwins(rasmiga qaralsin)
+
+4.Phantom Read(Фантомное чтение)
+Bu hatolik Non Repeatable Read ga o'xshab ketadi lekin ular umuman ikki hil
+misol uchun 1tranzaksiya keldi va qaysidir shaxarga 1 ta reys borligini ko'rdi
+keyin 2tranzaksiya keldi va usha reyslardi delete yoki insert qilib o'chirdi
+yoki qo'shdi ETIBOR BERAMIZ YUQORIDA FAQAT UPDATE QILAYOTGAN EDI 1tranzaksiya
+yana bir bor reyslarni ko'rmoqchi edi reyslar o'chib ketkanligini yoki qo'shilib
+qolganligini ko'rdi bu hato.
+Non Repeatable Read va Phantom Read birbiriga o'xshasa ham ikki hil yo'l bilan
+bartaraf qilinadi Non Repeatable Read payti biz 1ta tranzaksiyadan vaqtincha
+faqat o'sha column bekitib tursak Phantom Read da umuman
+table ni o'zini bloklab turishimzga to'g'ri keadi
+
+phantomread(rasmiga qaralsin)
+
+
+
+Bu hatolarni bartaraf qilish darajalari bor
+READ UNCOMMITTED - Lost Update ni hal qiladi
+READ COMMITTED - Lost Update va Dirty Read ni hal qiladi
+REPEATABLE READ - Lost Update,Dirty Read va Non Repeatable Read ni hal qiladi
+SERIALIZABLE - yuqoridagi hammasini hal qiladi

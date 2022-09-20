@@ -1,0 +1,28 @@
+Boshladik!!!
+
+JDBC - bu nima JDBC bu Java Database Connectivity..
+deylik bizda server bor va server sifatida biza Java ni tanladik yuqorida ko'rganimizdek
+Javani(serverni) Database bilan bog'lashimiz uchun bizga JDBC(module) yordam beradi aniqrog;i
+JDBC Api(Application programming interface) ko'rib turish uchun yanada tushunarli
+bo'liishi uchun Javada kod yozamiz oddiy String ko'rinishda va uni query sifatida berib yuboramz
+unda java.sql* package
+mavjud u package juda ko'p interface va classlardan tashkil topgan.
+Bilamizki bizda juda turli hil sql(realiton) database larimiz bor MySQL,PostgreSQL,OracleSQL
+java.sql* package imizda ichidagi JDBCDriver classi orqali hohlaganimiz bilan ulanish imkoni bo'ladi
+va Driverga qaysi realitio database kelishini berib yuborsak bo'ldi ulanish esa shu package
+ichidagi Connection interface orqali bo'ladi
+
+
+
+### preperstatmentga qaralsin ko'  getByBetweenDate methodiga
+
+FetchSize bu nima Java API mzini Database bilan bog'lashni o'rgandik va bildikki Java app miz ham bir server va Database
+ham bir server ikkalasini bo'g'lash uchun biz Javadan foydalandik va qandaydir class lar(Connection va undan keyin Statment
+lar bilan so'rov jo'natib va hakozo...) buarni hammasi TCP/IP asosida bo'ldi(bu ham bir protokol huddi HTTP ga o'xshash) IP lar orqali
+bog'landik tassavur qilaylik bizni Database mizda malumotlar juda ko'p tabiiyki bunda Java serverimzga kotta nagruzka tushadi
+va MemoryOutError berishi ehtimoli bor(etibor berin Error)#Eslatma Java Database dan kelayotgan malumot RAM da saqalanadi
+va RAM ko'raeolmaydi to'g'ri where operatori bilan biroz malumotlarni cheklashimiz mumkin lekin shunda ham juda ko'p bo'lsachi
+bunda bizga    preperStatment.setFetchSize(10); yordam beradi u kelayotgan malumot bo'lib bo'lib olib kelib beradi 10 bersak 10 tadan
+va yana so'rovni uzog'i qancha kuta olishimiz kerakligini bersak bo'ladi    preperStatment.setQueryTimeout(10); sekundda beriladi
+va uzog'i nechchi qator kelishi kerak yani max olsih mumkin bo'lgan qator preperStatment.setMaxRows(100);
+
